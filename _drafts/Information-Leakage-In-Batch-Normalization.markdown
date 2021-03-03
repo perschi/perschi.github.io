@@ -23,7 +23,7 @@ In the recently published paper [High-Performance Large-Scale Image Recognition 
 > care to prevent information leakage in
 > some contrastive learning algorithms ([Chen et al., 2020][chen-20]; [He et al., 2020][he-20])"
 
-This statement and the arguments in the references made me wonder, how severe this information leakage in batch normalization really is.
+This statement and the arguments in the references made me wonder, how severe this information leakage in Batch Normalization is.
 To investigate the leakage, I conduct some small experiments to find out what could be possible.
 
 ## The Inputs of Others
@@ -51,19 +51,19 @@ This network is then used to train the following loss, which is the mean squared
 F.mse_loss(transform(x),torch.flip(x, dims=[0]))
 ```
 
-This networks solves the task surprisingly well. As you can see in the figure below the reconstruction of the image resembles the other input in training mode.
-However, if the network is switched to test mode the reconstruction becomes arbtray but still resembles the original input.
+This network solves the task surprisingly well. As you can see in the figure below the reconstruction of the image resembles the other input in training mode.
+However, if the network is switched to test mode the reconstruction becomes arbitrary but still resembles the original input.
 
 <img src="/assets/information_leakage_in_batch_normalization/example0.svg">
 
 To put this into numbers, I use pairs of the test set and calculate average loss over all batches in training mode and test mode.
-Here, training mode achieves an average mean-squared error of 0.019 whereas test mode achieves only 0.098 which is almost an order of magnitude higher.
-This also shows how signifcant the difference between the training and test estimates can be in the worst case.
+Here, training-mode achieves an average mean-squared error of 0.019 whereas test-mode achieves only 0.098 which is almost an order of magnitude higher.
+This also shows how significant the difference between the training and test estimates can be in the worst case.
 However, it is known that batch normalization works better with larger batch size **(TODO add sources)**.
 Unfortunately, this experiment does not scale trivially to larger batch sizes since this would require some kind of strong positional encoding of the batch element and target batch element.
-This, is unlikely to happen in real scenarios. For that reason, I want to test performance in a more realistic scenario that should have similar problems as the
+This is unlikely to happen in real scenarios. For that reason, I want to test performance in a more realistic scenario that should have similar problems as the
 contrastive learning algorithms.
-There, the issue is that the learning target would be contained in the the same batch allowing the information to cheat.
+There, the issue is that the learning target would be contained in the same batch allowing the information to cheat.
 Hence, I want to build a data set showing the same issue by example.
 
 ## Hidden in Plain Batch
@@ -76,7 +76,7 @@ $$ f(x) = sin(x) + 2 \cdot cos(0.5 \cdot x) $$
 
 <img src="/assets/information_leakage_in_batch_normalization/function.svg">
 
-This function is than sampled regularly at 1000 in the intervall $$[ 0, 2 \pi ]$$.
+This function is then sampled regularly at 1000 in the interval $$[ 0, 2 \pi ]$$.
 These values are then interpreted as a sequence of values where I take a small subsequence of the values to predict the value of the next one.
 However, to introduce the problematic behavior each training instance consists of a batch of sequences where the values are shifted by one,
 so that the solution to the element is in the actual batch.
@@ -85,7 +85,7 @@ For instance, consider the function values $$ ..., 1.2, 1.4, 1.2, 1.1, 0.9, ...$
 $$((1.2,1.4),1.2), ((1.4, 1.2), 1.1), ((1.2, 1.1),0.9)$$
 
 This scenario is much more realistic than the previous example as it is similar to the contrastive learning approaches by [Chen et al., 2020][chen-20] and [He et al., 2020][he-20]. However, this situation could also arise more subtle if you work on raw audio generation. Here, you could split the audio into overlapping
-sequences and with a bit of bad luck you could get overlapping sequences in the the same batch.
+sequences and with a bit of bad luck, you could get overlapping sequences in the same batch.
 
 # The Experiment
 
@@ -107,13 +107,13 @@ In this case batch size refers to the number of sequence batches in a single bat
 
 # The Result
 
-For the evaluation, I compare the average loss per sequence batch on the training data set with batch normalzation in training mode $$ L_{train} $$ and test mode $$ L_{test} $$.
+For the evaluation, I compare the average loss per sequence batch on the training data set with Batch Normalization in training mode $$ L_{train} $$ and test mode $$ L_{test} $$.
 In the case that the network is able cheat to use the information leakage in batch normalzation,  $$ L_{train} $$  is smaller than $$ L_{test} $$.
 Otherwise, the network is forced to generalize.
 
 <img src="/assets/information_leakage_in_batch_normalization/cheatfair.svg">
 
-In this figure summarizing the results, we can see that the there is a connection between the batch size and the sequence length and the classification as a cheating network or a generalizing network. Namely, that the higher the sequence length, the more likely the network is to cheat even with larger batch sizes.
+In this figure summarizing the results, we can see that there is a connection between the batch size and the sequence length and the classification as a cheating network or a generalizing network. Namely, that the higher the sequence length, the more likely the network is to cheat even with larger batch sizes.
 For that reason, we have another argument to use large batch sizes when applying batch normalization, when we do not want interaction between elements.
 But, what if the information leakage could be used.
 
