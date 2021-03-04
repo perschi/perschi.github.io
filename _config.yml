@@ -19,12 +19,17 @@
 # in the templates via {{ site.myvariable }}.
 
 title: PerschisBlog
-email: 
-description: >- # this means to ignore newlines until "baseurl:"
-  Welcome to my blog.
+#email: 
+#description: >- # this means to ignore newlines until "baseurl:"
+#  Welcome to my blog.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-github_username:  perschi
+
+minima:
+  social_links:
+    github: perschi
+    reddit: perschi
+
 
 # Build settings
 theme: minima
