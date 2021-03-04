@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Information leakage in batch normalization"
-date:   2021-02-23 08:03:48 +0100
+date:   2021-03-04 00:00:00 +0000
 categories: deep learning, batch normalization
 ---
 <script type="text/x-mathjax-config">
@@ -59,7 +59,7 @@ However, if the network is switched to test mode the reconstruction becomes arbi
 To put this into numbers, I use pairs of the test set and calculate average loss over all batches in training mode and test mode.
 Here, training-mode achieves an average mean-squared error of 0.019 whereas test-mode achieves only 0.098 which is almost an order of magnitude higher.
 This also shows how significant the difference between the training and test estimates can be in the worst case.
-However, it is known that batch normalization works better with larger batch sizes **(TODO add sources)**.
+However, it is known that batch normalization works better with ["[...] a reasonably large batch size"][batch-size].
 Unfortunately, this experiment does not scale trivially to larger batch sizes since this would require some kind of strong positional encoding of the batch element and target batch element.
 This is unlikely to happen in real scenarios. For that reason, I want to test performance in a more realistic scenario that should have similar problems as the
 contrastive learning algorithms.
@@ -108,7 +108,7 @@ In this case batch size refers to the number of sequence batches in a single bat
 # The Result
 
 For the evaluation, I compare the average loss per sequence batch on the training data set with Batch Normalization in training mode and test mode.
-In the case that the network is able cheat due to the information leakage in batch normalzation,the training mode loss is smaller than test mode loss.
+In the case that the network can cheat due to the information leakage in Batch Normalization, the training mode loss is smaller than test mode loss.
 Otherwise, the network exhibits fair behavior by trying to overfit the data. Notice, that we do not worry about overfitting here since we evaluate the loss on the training data.
 
 <img src="/assets/information_leakage_in_batch_normalization/cheatfair.svg">
@@ -118,6 +118,17 @@ For that reason, we have another argument to use large batch sizes when applying
 
 ### Conclusion
 
+Information Leakage in Batch Normalization can be a real issue if the target of the model also appears in the training data and you don't have the
+resources to use a large enough batch size.
+In these cases, you may want to try the techniques proposed by [Chen et al., 2020][chen-20] and [He et al., 2020][he-20].
+Alternatively, you can use other normalization techniques such as [Layer Normalization][Ba-16-Layernorm] or [Group Normalization][Wu-18-groupnorm].
+
+*The Code to reproduce the charts can be found [here][code]*
+
 [brock-21]: https://arxiv.org/abs/2102.06171
 [chen-20]: https://arxiv.org/abs/2002.05709
 [he-20]: https://arxiv.org/abs/1911.05722
+[Wu-18-groupnorm]:https://arxiv.org/abs/1803.08494
+[Ba-16-Layernorm]:https://arxiv.org/abs/1607.06450
+[batch-size]:https://arxiv.org/abs/1906.03548
+[code]:https://github.com/perschi/deep-learning-blog-code
