@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Layer Normalization is a hyperspherical projection"
-date:   2021-03-04 00:00:0 +0000
+date:   2021-03-09 00:00:0 +0000
 categories: deep learning, Layer Normalization
 ---
 <script type="text/x-mathjax-config">
